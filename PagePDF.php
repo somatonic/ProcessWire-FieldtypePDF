@@ -7,7 +7,7 @@ class PagePDF extends Pagefile {
     public function thumbnail($width, $height = 0) {
 		$basename = basename($this->basename(), "." . $this->ext()); 		// i.e. myfile
 		$basename .= '.' . $width . 'x' . $height . ".png";	// i.e. myfile.100x100.jpg or myfile.100x100nw.jpg
-		$filename = $this->pagefiles->path() . $basename; 
+		$filename = $this->pagefiles->path() . $basename;
 
 		if(! is_file($filename)) {
             $imagick = new Imagick();
@@ -26,15 +26,15 @@ class PagePDF extends Pagefile {
     }
 
     public function removeThumbnails() {
-		if(! is_null($this->thumbnails)) return $this->thumbnails; 
+		if(! is_null($this->thumbnails)) return $this->thumbnails;
 
-		$thumbnails = new Pageimages($this->pagefiles->page); 
-		$dir = new DirectoryIterator($this->pagefiles->path); 
+		$thumbnails = new Pageimages($this->pagefiles->page);
+		$dir = new DirectoryIterator($this->pagefiles->path);
 
 		foreach($dir as $file) {
-			if($file->isDir() || $file->isDot()) continue; 			
-			if(!$this->isThumbnail($file->getFilename())) continue; 
-			unlink($file->getPathname()); 
+			if($file->isDir() || $file->isDot()) continue;
+			if(!$this->isThumbnail($file->getFilename())) continue;
+			unlink($file->getPathname());
 		}
     }
 
@@ -42,9 +42,9 @@ class PagePDF extends Pagefile {
 		$thumbnailName = basename($basename);
 		$originalName = basename($this->basename, "." . $this->ext());  // excludes extension
 
-		$re = 	'/^'  . 
-			$originalName . '\.' .		// myfile. 
-			'(\d+)x(\d+)' .			// 50x50	
+		$re = 	'/^'  .
+			$originalName . '\.' .		// myfile.
+			'(\d+)x(\d+)' .			// 50x50
 			'\.png' .
 			'$/';
 
@@ -61,21 +61,21 @@ class PagePDF extends Pagefile {
 	}
 
 	public function rename($basename) {
-		$basename = $this->pagefiles->cleanBasename($basename, true); 
+		$basename = $this->pagefiles->cleanBasename($basename, true);
 		if(rename($this->filename, $this->pagefiles->path . $basename)) {
             @$this->removeThumbnails();
-			$this->set('basename', $basename); 
-			return $basename; 
+			$this->set('basename', $basename);
+			return $basename;
 		}
-		return false; 
+		return false;
 	}
 
-	public function ___changed($what) {
+	public function ___changed($what, $old = null, $new = null) {
 		if($what == 'file') {
             @$this->removeThumbnails();
 		}
 
-		parent::___changed($what); 
+		parent::___changed($what, $old, $new);
 	}
 }
 
